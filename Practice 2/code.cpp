@@ -52,6 +52,7 @@ string toBinaryString(uint num)
 }
 
 ///*********************************************************
+
 class MyBigInt
 {
 private:
@@ -67,6 +68,8 @@ public:
 	MyBigInt(const MyBigInt &other);
 	~MyBigInt();
 
+	MyBigInt& operator = (const MyBigInt& other);
+
 	MyBigInt & INV();
 	MyBigInt &XOR(MyBigInt &firstNum, MyBigInt &secondNum);
 	MyBigInt &OR(MyBigInt &firstNum, MyBigInt &secondNum);
@@ -79,7 +82,9 @@ public:
 	MyBigInt &SUB(MyBigInt &firstNum, MyBigInt &secondNum);
 
 	MyBigInt &MUL(MyBigInt &firstNum, MyBigInt &secondNum);
-	MyBigInt &DIV(MyBigInt &firstNum, MyBigInt &secondNum);
+	void DIV(MyBigInt &firstNum, MyBigInt &secondNum,MyBigInt &R,MyBigInt &Q);
+
+	bool COMPARE(MyBigInt &firstNum, MyBigInt &secondNum);
 
 	// void MOD(MyBigInt &firstNum, MyBigInt &secondNum);
 	// void POWMOD(MyBigInt &firsNum, MyBigInt &secondNum);
@@ -129,7 +134,13 @@ MyBigInt::MyBigInt()
 MyBigInt::~MyBigInt(){
 
 };
-
+///*********************************************************
+MyBigInt& MyBigInt::operator = (const MyBigInt& other)
+{
+	this->number=other.number;
+	
+	return *this;
+}
 ///*********************************************************
 
 MyBigInt & MyBigInt::setHex(string &hexString)
@@ -376,6 +387,7 @@ MyBigInt & MyBigInt::shiftL(int n)
 }	
 
 ///*********************************************************
+
 MyBigInt &MyBigInt::ADD(MyBigInt &firstNum, MyBigInt &secondNum)
 {
 	if (firstNum.number.size() > secondNum.number.size())
@@ -442,7 +454,7 @@ MyBigInt &MyBigInt::SUB(MyBigInt &firstNum, MyBigInt &secondNum)
 	}
 
 	vector<uint> result;
-	
+
 	uint64_t borrow = 0;
 
 	for (uint i = 0; i < max(firstNum.number.size(), secondNum.number.size()); i++)
@@ -534,28 +546,77 @@ MyBigInt &MyBigInt::MUL(MyBigInt &firstNum, MyBigInt &secondNum)
 	return *this;
 }
 
-MyBigInt &MyBigInt::DIV(MyBigInt &firstNum, MyBigInt &secondNum)
+void MyBigInt::DIV(MyBigInt &firstNum, MyBigInt &secondNum,MyBigInt &R,MyBigInt &Q)
 {
-	// if(firstNum.number.size()>secondNum.number.size())
-	// {
-	// 	while(firstNum.number.size()!=secondNum.number.size())
-	// 	{
-	// 		secondNum.number.push_back(0);
-	// 	}
-	// }
-	// if(firstNum.number.size()<secondNum.number.size())
-	// {
-	// 	while(firstNum.number.size()!=secondNum.number.size())
-	// 	{
-	// 		firstNum.number.push_back(0);
-	// 	}
-	// }
+	if(firstNum.number.size()>secondNum.number.size())
+	{
+		while(firstNum.number.size()!=secondNum.number.size())
+		{
+			secondNum.number.push_back(0);
+		}
+	}
+	if(firstNum.number.size()<secondNum.number.size())
+	{
+		while(firstNum.number.size()!=secondNum.number.size())
+		{
+			firstNum.number.push_back(0);
+		}
+	}
 
-	// vector <uint> result;
+	int k = firstNum.number.size()*system;
 
-	// this->number=result;
+		R.number=firstNum.number;
+		Q.number.push_back(0);
 
-	return *this;
+	while(COMPARE(R,secondNum))
+	{
+		MyBigInt tmp=secondNum;
+		int t = R.number.size()*32;
+		tmp.shiftL(t-k);
+		
+		if((!(COMPARE(R,tmp)&&COMPARE(R,tmp))&&!COMPARE(R,tmp)))
+		{	
+			t=t-1;
+			tmp=secondNum;
+			tmp.shiftL(t-k);
+		}
+		R.SUB(R,tmp);
+
+		MyBigInt temp;
+		temp.number.push_back(1);
+		temp.shiftL(t-k);
+		
+		Q.ADD(Q,temp);
+	}
+
+}
+
+bool MyBigInt::COMPARE(MyBigInt &firstNum, MyBigInt &secondNum)
+{
+	int i=max(firstNum.number.size(),secondNum.number.size())-1;
+
+	while (firstNum.number[i] == secondNum.number[i])
+	{
+		i-=1;
+	} 
+
+	if (i==-1)
+	{
+		return true;
+	}
+	else
+	{
+		if (firstNum.number[i] > secondNum.number[i])
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		
+	}
+	
 }
 
 ///*********************************************************
@@ -620,6 +681,24 @@ int main()
 	e.MUL(a, b);
 	cout << e.getHex() << endl;
 	cout << endl;
+
+	test_1 = "33ced2c76b26cae94e162c4c0d2c0ff7c13094b0185a3c122e732d5ba77efebc";
+	test_2 = "97f92a75b3faf8939e8e98b96476fd22";
+
+	a.setHex(test_1);
+	b.setHex(test_2);
+
+	MyBigInt R,Q;
+
+	cout << a.getHex() << endl;
+	cout << "DIV" << endl;
+	cout << b.getHex() << endl;
+	cout << "Result" << endl;
+	e.DIV(a, b,R,Q);
+	cout << R.getHex() << endl;
+	cout << Q.getHex() << endl;
+	cout << endl;
+
 
 
 	return 0;
