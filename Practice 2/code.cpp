@@ -441,39 +441,23 @@ MyBigInt &MyBigInt::SUB(MyBigInt &firstNum, MyBigInt &secondNum)
 		}
 	}
 
-	reverse(firstNum.number.begin(), firstNum.number.end());
-	reverse(secondNum.number.begin(), secondNum.number.end());
-
 	vector<uint> result;
-
-	uint temp, digit;
-	uint borrow = 0;
-
-	if (system == 32)
-	{
-		digit = uint(pow(2, system)) ^ 0x1ffffffff;
-	}
-	else
-	{
-		digit = uint(pow(2, system)) ^ 0x1ffffffffffffffff;
-	}
+	
+	uint64_t borrow = 0;
 
 	for (uint i = 0; i < max(firstNum.number.size(), secondNum.number.size()); i++)
 	{
-		temp = firstNum.number[i] - secondNum.number[i] - borrow;
-		if (temp >= 0)
+		if (firstNum.number[i] >= secondNum.number[i] + borrow)
 		{
-			result.push_back(temp);
+			result.push_back(firstNum.number[i]-(secondNum.number[i]+ borrow));
 			borrow = 0;
 		}
 		else
 		{
-			result.push_back(digit + temp);
+			result.push_back(pow(2,system) - ((secondNum.number[i]+ borrow)-firstNum.number[i]));
 			borrow = 1;
 		}
 	}
-
-	reverse(result.begin(), result.end());
 
 	this->number = result;
 
