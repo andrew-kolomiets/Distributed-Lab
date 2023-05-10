@@ -123,6 +123,7 @@ MyBigInt::MyBigInt(const MyBigInt &other)
 MyBigInt::MyBigInt()
 {
 	number.clear();
+	system = 8 * sizeof(uint);
 }
 
 MyBigInt::~MyBigInt(){
@@ -159,23 +160,20 @@ void MyBigInt::setHex(string &hexString)
 
 string MyBigInt::getHex()
 {
+
 	string temp = "";
 
-	// for (unsigned int i = 0; i < number.size(); i ++)
-	// {
-	//     cout<<"~~"<<number[i];
-	// }
-	// cout<<endl;
-	for (unsigned int i = 0; i < number.size(); i++)
+	for (int i = 0; i < number.size(); i++)
 	{
-		string str = decToHex(number[i]);
+		string var = decToHex(number[i]);
 
-		while (str.length() != system / 4)
+		// cout<<endl<<var.size()<<" --- "<<system<<endl;
+		while (var.length() < (system / sizeof(uint)))
 		{
-			str = "0" + str;
+			var = "0" + var;
 		}
 
-		temp = str + temp;
+		temp = var + temp;
 	}
 
 	while (temp.size() > 1 && temp[0] == '0')
@@ -218,7 +216,7 @@ MyBigInt &MyBigInt::XOR(MyBigInt &firstNum, MyBigInt &secondNum)
 
 	for (int i = 0; i < size; i++)
 	{
-		this->number.push_back(firstNum.number[i] ^ secondNum.number[i]);
+		(this->number).push_back(firstNum.number[i] ^ secondNum.number[i]);
 	}
 
 	return *this;
@@ -315,26 +313,6 @@ void MyBigInt::shiftL(int n)
 	int cell_shift = n / system;
 	int bit_shift = n % system;
 
-	// for (int i = 0; i < cell_shift; i++)
-	// {
-	// 	number.insert(number.begin(), 0);
-	// }
-
-	// bool carry = false;
-
-	// for (int i = 0; i < number.size(); i++)
-	// {
-	// 	uint tmp = number[i];
-	// 	number[i] <<= bit_shift;
-	// 	number[i] |= carry;
-	// 	carry = (tmp >> (system - bit_shift)) != 0;
-	// }
-
-	// if (carry)
-	// {
-	// 	number.push_back(1);
-	// }
-
 	for (int i = 0; i < cell_shift; i++)
 	{
 		number.insert(number.begin(), 0);
@@ -389,7 +367,6 @@ void MyBigInt::shiftL(int n)
 	}
 }
 
-
 ///*********************************************************
 MyBigInt &MyBigInt::ADD(MyBigInt &firstNum, MyBigInt &secondNum)
 {
@@ -407,14 +384,11 @@ MyBigInt &MyBigInt::ADD(MyBigInt &firstNum, MyBigInt &secondNum)
 			firstNum.number.push_back(0);
 		}
 	}
-	// reverse(firstNum.number.begin(), firstNum.number.end());
-	// reverse(secondNum.number.begin(), secondNum.number.end());
 
 	vector<uint> result;
 
 	uint temp, digit;
 	uint carry = 0;
-
 	if (system == 32)
 	{
 		digit = uint(pow(2, system)) ^ 0x1ffffffff;
@@ -435,8 +409,6 @@ MyBigInt &MyBigInt::ADD(MyBigInt &firstNum, MyBigInt &secondNum)
 	{
 		result.push_back(carry);
 	}
-
-	// reverse(result.begin(), result.end());
 
 	this->number = result;
 
@@ -502,52 +474,23 @@ MyBigInt &MyBigInt::SUB(MyBigInt &firstNum, MyBigInt &secondNum)
 
 MyBigInt &MyBigInt::MUL(MyBigInt &firstNum, MyBigInt &secondNum)
 {
-	// if(firstNum.number.size()>secondNum.number.size())
-	// {
-	// 	while(firstNum.number.size()!=secondNum.number.size())
-	// 	{
-	// 		secondNum.number.push_back(0);
-	// 	}
-	// }
-	// if(firstNum.number.size()<secondNum.number.size())
-	// {
-	// 	while(firstNum.number.size()!=secondNum.number.size())
-	// 	{
-	// 		firstNum.number.push_back(0);
-	// 	}
-	// }
+	if(firstNum.number.size()>secondNum.number.size())
+	{
+		while(firstNum.number.size()!=secondNum.number.size())
+		{
+			secondNum.number.push_back(0);
+		}
+	}
+	if(firstNum.number.size()<secondNum.number.size())
+	{
+		while(firstNum.number.size()!=secondNum.number.size())
+		{
+			firstNum.number.push_back(0);
+		}
+	}
 
-	// vector <uint> result;
+	vector <uint> result;
 
-	// if(system==32)
-	// {
-	// 	digit = uint(pow(2, system))^0x1ffffffff;
-	// }
-	// else
-	// {
-	// 	digit = uint(pow(2, system))^0x1ffffffffffffffff;
-	// }
-
-	// for()
-	// {
-
-	// 	uint carry = 0;
-	// 	uint temp = 0;
-
-	// 	uint digit = ((pow(2, system_base)) - 1);
-
-	// 	for (int i = 0; i < max / 2; i++)
-	// 	{
-	// 		temp = mass_1[i] * mass_2[index] + carry;
-	// 		mass_[i] = temp & digit;
-	// 		carry = temp/pow(2,system);
-	// 	}
-	// 	mass_[max / 2] = carry;
-
-	// 	return mass_;
-	// }
-
-	// this->number=result;
 
 	return *this;
 }
@@ -588,48 +531,42 @@ int main()
 	a.setHex(test_1);
 	b.setHex(test_2);
 
-	// cout<<a.getHex()<<endl;
-	// cout<<"XOR"<<endl;
-	// cout<<b.getHex()<<endl;
-	// cout<<"Result"<<endl;
-	// c.XOR(a,b);
-	// cout<<c.getHex()<<endl;
+	cout << a.getHex() << endl;
+	cout << "XOR" << endl;
+	cout << b.getHex() << endl;
+	cout << "Result" << endl;
+	c.XOR(a, b);
+	cout << c.getHex() << endl;
 
-	// cout<<endl;
+	cout << endl;
 
-	// test_1="36f028580bb02cc8272a9a020f4200e346e276ae664e45ee80745574e2f5ab80";
-	// test_2="70983d692f648185febe6d6fa607630ae68649f7e6fc45b94680096c06e4fadb";
+	test_1 = "36f028580bb02cc8272a9a020f4200e346e276ae664e45ee80745574e2f5ab80";
+	test_2 = "70983d692f648185febe6d6fa607630ae68649f7e6fc45b94680096c06e4fadb";
 
-	// a.setHex(test_1);
-	// b.setHex(test_2);
+	a.setHex(test_1);
+	b.setHex(test_2);
 
-	// cout<<a.getHex()<<endl;
-	// cout<<"ADD"<<endl;
-	// cout<<b.getHex()<<endl;
-	// cout<<"Result"<<endl;
-	// d.ADD(a,b);
-	// cout<<d.getHex()<<endl;
-	// cout<<endl;
+	cout << a.getHex() << endl;
+	cout << "ADD" << endl;
+	cout << b.getHex() << endl;
+	cout << "Result" << endl;
+	d.ADD(a, b);
+	cout << d.getHex() << endl;
+	cout << endl;
 
-	// test_1="33ced2c76b26cae94e162c4c0d2c0ff7c13094b0185a3c122e732d5ba77efebc";
-	// test_2="22e962951cb6cd2ce279ab0e2095825c141d48ef3ca9dabf253e38760b57fe03";
+	test_1 = "33ced2c76b26cae94e162c4c0d2c0ff7c13094b0185a3c122e732d5ba77efebc";
+	test_2 = "22e962951cb6cd2ce279ab0e2095825c141d48ef3ca9dabf253e38760b57fe03";
 
-	// a.setHex(test_1);
-	// b.setHex(test_2);
+	a.setHex(test_1);
+	b.setHex(test_2);
 
-	// cout<<a.getHex()<<endl;
-	// cout<<"SUB"<<endl;
-	// cout<<b.getHex()<<endl;
-	// cout<<"Result"<<endl;
-	// e.SUB(a,b);
-	// cout<<e.getHex()<<endl;
-	// cout<<endl;
-
-	for (int i = 1; i < 40; i++)
-	{
-		a.shiftL(i);
-		cout << endl<< a.getHex() << endl;
-	}
+	cout << a.getHex() << endl;
+	cout << "SUB" << endl;
+	cout << b.getHex() << endl;
+	cout << "Result" << endl;
+	e.SUB(a, b);
+	cout << e.getHex() << endl;
+	cout << endl;
 
 	return 0;
 }
