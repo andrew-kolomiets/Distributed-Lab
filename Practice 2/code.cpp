@@ -156,7 +156,18 @@ string MyBigInt::getHex()
 	// cout<<endl;
 	for (unsigned int i = 0; i < number.size();i ++) 
 	{
-        temp=decToHex(number[i])+temp;
+		string str=decToHex(number[i]);
+
+		while(str.length()!=system/4)
+		{
+			str="0"+str;
+		}
+
+        temp=str+temp;
+    }
+
+	while (temp.size() > 1 && temp[0] == '0') {
+        temp.erase(0, 1);
     }
 
 	return temp;
@@ -608,50 +619,50 @@ int main()
 	b.setHex(test_2);
 
 	
-	cout<<a.getHex()<<endl;
-	cout<<"XOR"<<endl;
-	cout<<b.getHex()<<endl;
-	cout<<"Result"<<endl;
-	c.XOR(a,b);
-	cout<<c.getHex()<<endl;
+	// cout<<a.getHex()<<endl;
+	// cout<<"XOR"<<endl;
+	// cout<<b.getHex()<<endl;
+	// cout<<"Result"<<endl;
+	// c.XOR(a,b);
+	// cout<<c.getHex()<<endl;
 
-	cout<<endl;
+	// cout<<endl;
 	
-	test_1="36f028580bb02cc8272a9a020f4200e346e276ae664e45ee80745574e2f5ab80";
-	test_2="70983d692f648185febe6d6fa607630ae68649f7e6fc45b94680096c06e4fadb";
+	// test_1="36f028580bb02cc8272a9a020f4200e346e276ae664e45ee80745574e2f5ab80";
+	// test_2="70983d692f648185febe6d6fa607630ae68649f7e6fc45b94680096c06e4fadb";
 
-	a.setHex(test_1);
-	b.setHex(test_2);
+	// a.setHex(test_1);
+	// b.setHex(test_2);
 
-	cout<<a.getHex()<<endl;
-	cout<<"ADD"<<endl;
-	cout<<b.getHex()<<endl;
-	cout<<"Result"<<endl;
-	d.ADD(a,b);
-	cout<<d.getHex()<<endl;
-	cout<<endl;
+	// cout<<a.getHex()<<endl;
+	// cout<<"ADD"<<endl;
+	// cout<<b.getHex()<<endl;
+	// cout<<"Result"<<endl;
+	// d.ADD(a,b);
+	// cout<<d.getHex()<<endl;
+	// cout<<endl;
 
 
-	test_1="33ced2c76b26cae94e162c4c0d2c0ff7c13094b0185a3c122e732d5ba77efebc";
-	test_2="22e962951cb6cd2ce279ab0e2095825c141d48ef3ca9dabf253e38760b57fe03";
+	// test_1="33ced2c76b26cae94e162c4c0d2c0ff7c13094b0185a3c122e732d5ba77efebc";
+	// test_2="22e962951cb6cd2ce279ab0e2095825c141d48ef3ca9dabf253e38760b57fe03";
 
-	a.setHex(test_1);
-	b.setHex(test_2);
+	// a.setHex(test_1);
+	// b.setHex(test_2);
 
-	cout<<a.getHex()<<endl;
-	cout<<"SUB"<<endl;
-	cout<<b.getHex()<<endl;
-	cout<<"Result"<<endl;
-	e.SUB(a,b);
-	cout<<e.getHex()<<endl;
-	cout<<endl;
+	// cout<<a.getHex()<<endl;
+	// cout<<"SUB"<<endl;
+	// cout<<b.getHex()<<endl;
+	// cout<<"Result"<<endl;
+	// e.SUB(a,b);
+	// cout<<e.getHex()<<endl;
+	// cout<<endl;
 	
 
-	// for (int i = 1; i < 40; i++)
-	// {
-	// 	a.shiftL_(1);
-	// 	cout<<endl<<i<<" "<<a.getHex()<<endl;
-	// }
+	for (int i = 1; i < 40; i++)
+	{
+		a.shiftL_(1);
+		cout<<endl<<a.getHex()<<endl;
+	}
 	
 	
 	
