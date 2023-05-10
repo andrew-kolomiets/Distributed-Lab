@@ -59,7 +59,7 @@ private:
 	int system;
 
 public:
-	void setHex(string &hexString);
+	MyBigInt &  setHex(string &hexString);
 	string getHex();
 
 	MyBigInt();
@@ -67,13 +67,13 @@ public:
 	MyBigInt(const MyBigInt &other);
 	~MyBigInt();
 
-	void INV();
+	MyBigInt & INV();
 	MyBigInt &XOR(MyBigInt &firstNum, MyBigInt &secondNum);
 	MyBigInt &OR(MyBigInt &firstNum, MyBigInt &secondNum);
 	MyBigInt &AND(MyBigInt &firstNum, MyBigInt &secondNum);
-	void shiftR(int size);
-	void shiftL(int size);
-	void shiftL_(int size);
+	MyBigInt & shiftR(int size);
+	MyBigInt & shiftL(int size);
+	MyBigInt & shiftL_(int size);
 
 	MyBigInt &ADD(MyBigInt &firstNum, MyBigInt &secondNum);
 	MyBigInt &SUB(MyBigInt &firstNum, MyBigInt &secondNum);
@@ -132,7 +132,7 @@ MyBigInt::~MyBigInt(){
 
 ///*********************************************************
 
-void MyBigInt::setHex(string &hexString)
+MyBigInt & MyBigInt::setHex(string &hexString)
 {
 	number.clear();
 
@@ -156,6 +156,8 @@ void MyBigInt::setHex(string &hexString)
 		number.push_back(hexToDec(chunks[i]));
 	}
 	reverse(number.begin(), number.end());
+
+	return *this; 
 }
 
 string MyBigInt::getHex()
@@ -186,13 +188,15 @@ string MyBigInt::getHex()
 
 ///*********************************************************
 
-void MyBigInt::INV()
+MyBigInt & MyBigInt::INV()
 {
 
 	for (int i = 0; i < number.size(); i++)
 	{
 		number[i] = ~number[i];
 	}
+
+	return *this;
 }
 
 MyBigInt &MyBigInt::XOR(MyBigInt &firstNum, MyBigInt &secondNum)
@@ -276,7 +280,7 @@ MyBigInt &MyBigInt::AND(MyBigInt &firstNum, MyBigInt &secondNum)
 	return *this;
 }
 
-void MyBigInt::shiftR(int n)
+MyBigInt & MyBigInt::shiftR(int n)
 {
 
 	int cell_shift = n / system;
@@ -306,9 +310,11 @@ void MyBigInt::shiftR(int n)
 
 		number[number.size() - 1] >>= 1;
 	}
+	
+	return *this; 
 }
 
-void MyBigInt::shiftL(int n)
+MyBigInt & MyBigInt::shiftL(int n)
 {
 	int cell_shift = n / system;
 	int bit_shift = n % system;
@@ -365,7 +371,9 @@ void MyBigInt::shiftL(int n)
 			triger = false;
 		}
 	}
-}
+
+	return *this; 
+}	
 
 ///*********************************************************
 MyBigInt &MyBigInt::ADD(MyBigInt &firstNum, MyBigInt &secondNum)
@@ -387,22 +395,22 @@ MyBigInt &MyBigInt::ADD(MyBigInt &firstNum, MyBigInt &secondNum)
 
 	vector<uint> result;
 
-	uint temp, digit;
+	uint64_t temp, digit;
 	uint carry = 0;
 	if (system == 32)
 	{
-		digit = uint(pow(2, system)) ^ 0x1ffffffff;
+		digit = uint64_t(pow(2, system)) ^ 0x1ffffffff;
 	}
 	else
 	{
-		digit = uint(pow(2, system)) ^ 0x1ffffffffffffffff;
+		digit = uint64_t(pow(2, system)) ^ 0x1ffffffffffffffff;
 	}
 
 	for (uint i = 0; i < max(firstNum.number.size(), secondNum.number.size()); i++)
 	{
-		temp = firstNum.number[i] + secondNum.number[i] + carry;
+		temp = (uint64_t)firstNum.number[i] + (uint64_t)secondNum.number[i] + carry;
 		result.push_back(temp & digit);
-		carry = temp / pow(2, system);
+		carry = temp / (uint64_t)pow(2, system);
 	}
 
 	if (carry != 0)
@@ -489,8 +497,55 @@ MyBigInt &MyBigInt::MUL(MyBigInt &firstNum, MyBigInt &secondNum)
 		}
 	}
 
-	vector <uint> result;
+	uint64_t digit;
 
+	if (system == 32)
+	{
+		digit = uint(pow(2, system)) ^ 0x1ffffffff;
+	}
+	else
+	{
+		digit = uint(pow(2, system)) ^ 0x1ffffffffffffffff;
+	}
+
+	MyBigInt result;
+
+	for (size_t i = 0; i < (max(firstNum.number.size(), secondNum.number.size())); i++)
+	{
+		result.number.push_back(0);
+	}
+	
+
+	for (int i = 0; i < (max(firstNum.number.size(), secondNum.number.size())); i++)
+	{
+		vector <uint> temp;
+
+		uint64_t carry=0;
+
+		for (int k = 0; k < (max(firstNum.number.size(), secondNum.number.size())); k++)
+		{
+			uint64_t mask = 0xFFFFFFFF;
+			temp.push_back(((((uint64_t)firstNum.number[k]*(uint64_t)secondNum.number[i])&mask)+(( uint64_t)carry&mask)&mask));
+			carry=(uint64_t)firstNum.number[k]*(uint64_t)secondNum.number[i]/pow(2,system)+( uint64_t)carry/pow(2,system);
+		}
+		
+		temp.push_back((uint)carry);
+
+		MyBigInt tmp;
+
+		
+		for (int j = 0; j < i; j++)
+		{
+			temp.insert(temp.begin(),0);
+		}
+
+		tmp.number=temp;
+
+		result.ADD(tmp,result);
+
+	}
+
+	this->number=result.number;
 
 	return *this;
 }
@@ -567,6 +622,21 @@ int main()
 	e.SUB(a, b);
 	cout << e.getHex() << endl;
 	cout << endl;
+
+	test_1 = "7d7deab2affa38154326e96d350deee1";
+	test_2 = "97f92a75b3faf8939e8e98b96476fd22";
+
+	a.setHex(test_1);
+	b.setHex(test_2);
+
+	cout << a.getHex() << endl;
+	cout << "MUL" << endl;
+	cout << b.getHex() << endl;
+	cout << "Result" << endl;
+	e.MUL(a, b);
+	cout << e.getHex() << endl;
+	cout << endl;
+
 
 	return 0;
 }
