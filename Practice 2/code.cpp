@@ -605,40 +605,40 @@ void MyBigInt::DIV(MyBigInt &firstNum, MyBigInt &secondNum,MyBigInt &R,MyBigInt 
 
 MyBigInt &MyBigInt::MOD(MyBigInt &firstNum, MyBigInt &secondNum)
 {
-	int k=secondNum.number.size()-1;
+	int k=secondNum.number.size();
 
-	string one="1"; MyBigInt B(one);
+	string one="1"; 
+	MyBigInt B(one); 
+	B.shiftL(2*k);
 
-	B.shiftL(2*(k+1));
-
-	MyBigInt nu, R,Q;
+	MyBigInt nu, R,Q,t;
 
 	nu.DIV(B,secondNum, R,Q);
 
-    nu=;
+	nu=Q;
 
 	MyBigInt q=firstNum;
 
 
-	if (k-1 >= q.number.size()) 
+	if (k-2 >= q.number.size()) 
 	{
 		q.number.clear();
 	} else 
 	{
-		q.number.erase(q.number.begin(), q.number.begin() + k-1);
+		q.number.erase(q.number.begin(), q.number.begin() + k-2);
 	}
 
 	q.MUL(q,nu);
 
-	if (k+1 >= q.number.size()) 
+	if (k >= q.number.size()) 
 	{
 		q.number.clear();
 	} else 
 	{
-		q.number.erase(q.number.begin(), q.number.begin() + k+1);
+		q.number.erase(q.number.begin(), q.number.begin() + k);
 	}
 
-	MyBigInt r=r.SUB(firstNum,q.MUL(q,secondNum));
+	MyBigInt r=r.SUB(firstNum,t.MUL(q,secondNum));
 
 	while(r.COMPARE(r,secondNum)==1||r.COMPARE(r,secondNum)==0)
 	{
@@ -647,7 +647,7 @@ MyBigInt &MyBigInt::MOD(MyBigInt &firstNum, MyBigInt &secondNum)
 
 	this->number=r.number;
 
-	return r ;
+	return *this ;
 }
 
 int MyBigInt::COMPARE(MyBigInt &firstNum, MyBigInt &secondNum)
@@ -759,23 +759,6 @@ int main()
 	cout <<"Quoter: "<< Q.getHex() << endl;
 	cout << endl;
 
-
-	test_1 = "33ced2c76b26cae94e162c4c0d2c0ff7c13094b0185a3c122e732d5ba77efebc";
-	test_2 = "97f92a75b3faf8939e8e98b96476fd22";
-
-	a.setHex(test_1);
-	b.setHex(test_2);
-
-	cout << a.getHex() << endl;
-	cout << "DIV" << endl;
-	cout << b.getHex() << endl;
-	cout << "Result" << endl;
-	e.MOD(a, b);
-	cout << e.getHex() << endl;
-	cout << endl;
-
-
-	
 
 	return 0;
 }
