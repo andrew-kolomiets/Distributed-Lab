@@ -51,6 +51,21 @@ string toBinaryString(uint num)
 	return binary;
 }
 
+int countBits(uint number) {
+    int count = 0;
+    while (number != 0) {
+        count++;
+        number >>= 1; 
+    }
+    return count;
+}
+
+void removeTrailingZeros(vector<uint>& vec) {
+    while (!vec.empty() && vec.back() == 0) {
+        vec.pop_back();
+    }
+}
+
 ///*********************************************************
 
 class MyBigInt
@@ -74,9 +89,9 @@ public:
 	MyBigInt &XOR(MyBigInt &firstNum, MyBigInt &secondNum);
 	MyBigInt &OR(MyBigInt &firstNum, MyBigInt &secondNum);
 	MyBigInt &AND(MyBigInt &firstNum, MyBigInt &secondNum);
-	MyBigInt & shiftR(int size);
-	MyBigInt & shiftL(int size);
-	MyBigInt & shiftL_(int size);
+	MyBigInt &shiftR(int size);
+	MyBigInt &shiftL(int size);
+	MyBigInt &shiftL_(int size);
 
 	MyBigInt &ADD(MyBigInt &firstNum, MyBigInt &secondNum);
 	MyBigInt &SUB(MyBigInt &firstNum, MyBigInt &secondNum);
@@ -84,10 +99,13 @@ public:
 	MyBigInt &MUL(MyBigInt &firstNum, MyBigInt &secondNum);
 	void DIV(MyBigInt &firstNum, MyBigInt &secondNum,MyBigInt &R,MyBigInt &Q);
 
-	bool COMPARE(MyBigInt &firstNum, MyBigInt &secondNum);
-
-	// void MOD(MyBigInt &firstNum, MyBigInt &secondNum);
+	MyBigInt & MOD(MyBigInt &firstNum, MyBigInt &secondNum);
 	// void POWMOD(MyBigInt &firsNum, MyBigInt &secondNum);
+
+
+	int COMPARE(MyBigInt &firstNum, MyBigInt &secondNum);
+
+	
 };
 ///*********************************************************
 
@@ -548,33 +566,23 @@ MyBigInt &MyBigInt::MUL(MyBigInt &firstNum, MyBigInt &secondNum)
 
 void MyBigInt::DIV(MyBigInt &firstNum, MyBigInt &secondNum,MyBigInt &R,MyBigInt &Q)
 {
-	if(firstNum.number.size()>secondNum.number.size())
-	{
-		while(firstNum.number.size()!=secondNum.number.size())
-		{
-			secondNum.number.push_back(0);
-		}
-	}
-	if(firstNum.number.size()<secondNum.number.size())
-	{
-		while(firstNum.number.size()!=secondNum.number.size())
-		{
-			firstNum.number.push_back(0);
-		}
-	}
+	removeTrailingZeros(firstNum.number);
+	removeTrailingZeros(secondNum.number);
 
-	int k = firstNum.number.size()*system;
+	int k = secondNum.number.size()*system-system+countBits(secondNum.number[secondNum.number.size()-1]);
 
-		R.number=firstNum.number;
-		Q.number.push_back(0);
+	R.number=firstNum.number;
+	Q.number.push_back(0);
 
-	while(COMPARE(R,secondNum))
+	while(COMPARE(R,secondNum)==1||COMPARE(R,secondNum)==0)
 	{
 		MyBigInt tmp=secondNum;
-		int t = R.number.size()*32;
+
+		int t = R.number.size()*system-system+countBits(R.number[R.number.size()-1]) ;
+		
 		tmp.shiftL(t-k);
 		
-		if((!(COMPARE(R,tmp)&&COMPARE(R,tmp))&&!COMPARE(R,tmp)))
+		if((COMPARE(R,tmp)==-1))
 		{	
 			t=t-1;
 			tmp=secondNum;
@@ -582,40 +590,51 @@ void MyBigInt::DIV(MyBigInt &firstNum, MyBigInt &secondNum,MyBigInt &R,MyBigInt 
 		}
 		R.SUB(R,tmp);
 
+		removeTrailingZeros(R.number);
+
 		MyBigInt temp;
 		temp.number.push_back(1);
 		temp.shiftL(t-k);
 		
 		Q.ADD(Q,temp);
+
+		removeTrailingZeros(Q.number);
+
 	}
 
 }
 
-bool MyBigInt::COMPARE(MyBigInt &firstNum, MyBigInt &secondNum)
+MyBigInt & MOD(MyBigInt &firstNum, MyBigInt &secondNum)
 {
-	int i=max(firstNum.number.size(),secondNum.number.size())-1;
 
-	while (firstNum.number[i] == secondNum.number[i])
-	{
-		i-=1;
-	} 
+}
 
-	if (i==-1)
-	{
-		return true;
-	}
-	else
-	{
-		if (firstNum.number[i] > secondNum.number[i])
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-		
-	}
+int MyBigInt::COMPARE(MyBigInt &firstNum, MyBigInt &secondNum)
+{
+	
+    if (firstNum.number.size() > secondNum.number.size())
+    {
+        return 1;
+    }
+    else if (firstNum.number.size() < secondNum.number.size())
+    {
+        return -1;
+    }
+
+    for (int i = firstNum.number.size() - 1; i >= 0; i--)
+    {
+        if (firstNum.number[i] > secondNum.number[i])
+        {
+            return 1;
+        }
+        else if (firstNum.number[i] < secondNum.number[i])
+        {
+            return -1;
+        }
+    }
+
+    // The numbers are equal
+    return 0;
 	
 }
 
