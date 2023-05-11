@@ -75,7 +75,7 @@ private:
 	int system;
 
 public:
-	MyBigInt &  setHex(string &hexString);
+	MyBigInt &setHex(string &hexString);
 	string getHex();
 
 	MyBigInt();
@@ -83,15 +83,14 @@ public:
 	MyBigInt(const MyBigInt &other);
 	~MyBigInt();
 
-	MyBigInt& operator = (const MyBigInt& other);
+	MyBigInt &operator = (const MyBigInt& other);
 
-	MyBigInt & INV();
+	MyBigInt &INV();
 	MyBigInt &XOR(MyBigInt &firstNum, MyBigInt &secondNum);
 	MyBigInt &OR(MyBigInt &firstNum, MyBigInt &secondNum);
 	MyBigInt &AND(MyBigInt &firstNum, MyBigInt &secondNum);
 	MyBigInt &shiftR(int size);
 	MyBigInt &shiftL(int size);
-	MyBigInt &shiftL_(int size);
 
 	MyBigInt &ADD(MyBigInt &firstNum, MyBigInt &secondNum);
 	MyBigInt &SUB(MyBigInt &firstNum, MyBigInt &secondNum);
@@ -99,7 +98,7 @@ public:
 	MyBigInt &MUL(MyBigInt &firstNum, MyBigInt &secondNum);
 	void DIV(MyBigInt &firstNum, MyBigInt &secondNum,MyBigInt &R,MyBigInt &Q);
 
-	MyBigInt & MOD(MyBigInt &firstNum, MyBigInt &secondNum);
+	MyBigInt &MOD(MyBigInt &firstNum, MyBigInt &secondNum);
 	// void POWMOD(MyBigInt &firsNum, MyBigInt &secondNum);
 
 
@@ -604,9 +603,51 @@ void MyBigInt::DIV(MyBigInt &firstNum, MyBigInt &secondNum,MyBigInt &R,MyBigInt 
 
 }
 
-MyBigInt & MOD(MyBigInt &firstNum, MyBigInt &secondNum)
+MyBigInt &MyBigInt::MOD(MyBigInt &firstNum, MyBigInt &secondNum)
 {
+	int k=secondNum.number.size()-1;
 
+	string one="1"; MyBigInt B(one);
+
+	B.shiftL(2*(k+1));
+
+	MyBigInt nu, R,Q;
+
+	nu.DIV(B,secondNum, R,Q);
+
+    nu=;
+
+	MyBigInt q=firstNum;
+
+
+	if (k-1 >= q.number.size()) 
+	{
+		q.number.clear();
+	} else 
+	{
+		q.number.erase(q.number.begin(), q.number.begin() + k-1);
+	}
+
+	q.MUL(q,nu);
+
+	if (k+1 >= q.number.size()) 
+	{
+		q.number.clear();
+	} else 
+	{
+		q.number.erase(q.number.begin(), q.number.begin() + k+1);
+	}
+
+	MyBigInt r=r.SUB(firstNum,q.MUL(q,secondNum));
+
+	while(r.COMPARE(r,secondNum)==1||r.COMPARE(r,secondNum)==0)
+	{
+		r.SUB(r,secondNum);
+	}
+
+	this->number=r.number;
+
+	return r ;
 }
 
 int MyBigInt::COMPARE(MyBigInt &firstNum, MyBigInt &secondNum)
@@ -714,11 +755,27 @@ int main()
 	cout << b.getHex() << endl;
 	cout << "Result" << endl;
 	e.DIV(a, b,R,Q);
-	cout << R.getHex() << endl;
-	cout << Q.getHex() << endl;
+	cout <<"Reminder: "<< R.getHex() << endl;
+	cout <<"Quoter: "<< Q.getHex() << endl;
 	cout << endl;
 
 
+	test_1 = "33ced2c76b26cae94e162c4c0d2c0ff7c13094b0185a3c122e732d5ba77efebc";
+	test_2 = "97f92a75b3faf8939e8e98b96476fd22";
+
+	a.setHex(test_1);
+	b.setHex(test_2);
+
+	cout << a.getHex() << endl;
+	cout << "DIV" << endl;
+	cout << b.getHex() << endl;
+	cout << "Result" << endl;
+	e.MOD(a, b);
+	cout << e.getHex() << endl;
+	cout << endl;
+
+
+	
 
 	return 0;
 }
